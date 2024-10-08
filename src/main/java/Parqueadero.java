@@ -5,6 +5,9 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class Parqueadero extends JFrame {
     // Atributos
@@ -175,8 +178,38 @@ public class Parqueadero extends JFrame {
     private void eliminarVehiculo() {
         String numero = JOptionPane.showInputDialog(this, "Ingrese el número del vehículo a eliminar:");
         int num = Integer.parseInt(numero);
-        vehicleList.removeIf(vehiculo -> vehiculo.getNumero() == num);
-        actualizarTabla();
+
+        // Buscar el vehículo por número
+        Vehicle vehiculoAEliminar = null;
+        for (Vehicle vehiculo : vehicleList) {
+            if (vehiculo.getNumero() == num) {
+                vehiculoAEliminar = vehiculo;
+                break;
+            }
+        }
+
+        if (vehiculoAEliminar != null) {
+            String horaSalida = JOptionPane.showInputDialog(this, "Ingrese la hora de salida (HH:mm):");
+            long minutos = calcularMinutos(vehiculoAEliminar.getHoraIngreso(), horaSalida);
+
+            int totalPagar = (int) (minutos * vehiculoAEliminar.getTarifaPorMinuto());
+            JOptionPane.showMessageDialog(this, "El total a pagar es: " + totalPagar + " COP");
+
+            // Eliminar el vehículo de la lista
+            vehicleList.remove(vehiculoAEliminar);
+            actualizarTabla();
+        } else {
+            JOptionPane.showMessageDialog(this, "Vehículo no encontrado");
+        }
+    }
+
+    // Método para calcular la cantidad de minutos entre la hora de ingreso y la hora de salida
+    private long calcularMinutos(String horaIngreso, String horaSalida) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        LocalTime tiempoIngreso = LocalTime.parse(horaIngreso, formatter);
+        LocalTime tiempoSalida = LocalTime.parse(horaSalida, formatter);
+
+        return Duration.between(tiempoIngreso, tiempoSalida).toMinutes();
     }
 
     // Método para mostrar resumen de vehículos y valor total
@@ -189,7 +222,8 @@ public class Parqueadero extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new Parqueadero().setVisible(true);
+            Parqueadero parqueadero = new Parqueadero();
+            parqueadero.setVisible(true);
         });
     }
 }
@@ -226,12 +260,17 @@ class Vehicle {
         return horaIngreso;
     }
 
-    public int getValorPagar() {
+    public int getTarifaPorMinuto() {
         return tarifaPorMinuto;
+    }
+
+    public int getValorPagar() {
+        return 0; // Placeholder
     }
 
     @Override
     public String toString() {
-        return "Número: " + numero + ", Placa: " + placa + ", Tipo: " + tipo + ", Hora: " + horaIngreso;
+        return "Número: " + numero + ", Placa: " + placa + ", Tipo: " + tipo + ", Hora Ingreso: " + horaIngreso;
     }
 }
+
