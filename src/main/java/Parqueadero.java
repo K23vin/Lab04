@@ -3,7 +3,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.List; // Se importa java.util.List para evitar ambigüedades
+import java.util.List;
 import java.util.Stack;
 
 public class Parqueadero extends JFrame {
@@ -15,6 +15,11 @@ public class Parqueadero extends JFrame {
 
     private DefaultTableModel tableModel;
     private JTable table;
+
+    // Datos precargados (placa, tipo, hora de ingreso)
+    private String[] placas = {"ABC123", "XYZ456", "MOT789", "CIC321", "CAR654"};
+    private String[] tipos = {"Carro", "Carro", "Motocicleta", "Bicicleta/Ciclomotor", "Carro"};
+    private String[] horasIngreso = {"10:30", "11:00", "09:45", "08:30", "12:15"};
 
     public Parqueadero() {
         setTitle("Administración de Parqueadero");
@@ -52,6 +57,9 @@ public class Parqueadero extends JFrame {
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         add(mainPanel);
 
+        // Cargar datos predefinidos
+        cargarDatosPredefinidos();
+
         // Acción para agregar vehículo
         addButton.addActionListener(e -> agregarVehiculo());
         // Acción para mostrar vehículos de 2 ruedas
@@ -66,28 +74,27 @@ public class Parqueadero extends JFrame {
         exitButton.addActionListener(e -> System.exit(0));
     }
 
-    // Método para agregar un vehículo
-    private void agregarVehiculo() {
-        String placa = JOptionPane.showInputDialog(this, "Ingrese la placa del vehículo:");
-        String[] opciones = {"Bicicleta/Ciclomotor", "Motocicleta", "Carro"};
-        String tipo = (String) JOptionPane.showInputDialog(this, "Seleccione el tipo de vehículo:", "Tipo de Vehículo",
-                JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
-        String horaIngreso = JOptionPane.showInputDialog(this, "Ingrese la hora de ingreso (HH:mm):");
+    // Método para cargar datos predefinidos
+    private void cargarDatosPredefinidos() {
+        for (int i = 0; i < placas.length; i++) {
+            String placa = placas[i];
+            String tipo = tipos[i];
+            String horaIngreso = horasIngreso[i];
 
-        int tarifa = obtenerTarifa(tipo);
+            int tarifa = obtenerTarifa(tipo);
 
-        Vehicle vehiculo = new Vehicle(vehicleCounter++, placa, tipo, horaIngreso, tarifa);
+            Vehicle vehiculo = new Vehicle(vehicleCounter++, placa, tipo, horaIngreso, tarifa);
 
-        // Añadir a la lista general
-        vehicleList.add(vehiculo);
+            // Añadir a la lista general
+            vehicleList.add(vehiculo);
 
-        // Añadir a la pila correspondiente
-        if (tipo.equals("Bicicleta/Ciclomotor") || tipo.equals("Motocicleta")) {
-            twoWheelStack.push(vehiculo);
-        } else {
-            fourWheelStack.push(vehiculo);
+            // Añadir a la pila correspondiente
+            if (tipo.equals("Bicicleta/Ciclomotor") || tipo.equals("Motocicleta")) {
+                twoWheelStack.push(vehiculo);
+            } else {
+                fourWheelStack.push(vehiculo);
+            }
         }
-
         actualizarTabla();
     }
 
@@ -113,6 +120,31 @@ public class Parqueadero extends JFrame {
                     vehiculo.getHoraIngreso(), vehiculo.getValorPagar()};
             tableModel.addRow(rowData);
         }
+    }
+
+    // Método para agregar un vehículo
+    private void agregarVehiculo() {
+        String placa = JOptionPane.showInputDialog(this, "Ingrese la placa del vehículo:");
+        String[] opciones = {"Bicicleta/Ciclomotor", "Motocicleta", "Carro"};
+        String tipo = (String) JOptionPane.showInputDialog(this, "Seleccione el tipo de vehículo:", "Tipo de Vehículo",
+                JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+        String horaIngreso = JOptionPane.showInputDialog(this, "Ingrese la hora de ingreso (HH:mm):");
+
+        int tarifa = obtenerTarifa(tipo);
+
+        Vehicle vehiculo = new Vehicle(vehicleCounter++, placa, tipo, horaIngreso, tarifa);
+
+        // Añadir a la lista general
+        vehicleList.add(vehiculo);
+
+        // Añadir a la pila correspondiente
+        if (tipo.equals("Bicicleta/Ciclomotor") || tipo.equals("Motocicleta")) {
+            twoWheelStack.push(vehiculo);
+        } else {
+            fourWheelStack.push(vehiculo);
+        }
+
+        actualizarTabla();
     }
 
     // Método para mostrar vehículos de 2 ruedas
