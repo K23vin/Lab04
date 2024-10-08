@@ -47,7 +47,7 @@ public class RegistroCitasEPS {
     private JTextField txtNombre, txtEdad, txtAfiliacion, txtCondicion;
     private JLabel lblTurnoActual, lblTiempoRestante, lblTurnosPendientes;
     private JButton btnExtender;
-    
+
     private PriorityQueue<Paciente> colaPacientes = new PriorityQueue<>();
     private Paciente turnoEnCurso = null;
     private int tiempoRestante = 5; // Tiempo en segundos
@@ -123,6 +123,9 @@ public class RegistroCitasEPS {
         lblTurnosPendientes.setBounds(10, 240, 350, 20);
         frame.add(lblTurnosPendientes);
 
+        // Inicializar pacientes de prueba
+        inicializarPacientes();
+
         // Iniciar el temporizador que actualiza el tiempo cada segundo
         iniciarSimulacion();
 
@@ -178,6 +181,29 @@ public class RegistroCitasEPS {
         } else {
             JOptionPane.showMessageDialog(frame, "No hay un turno en curso para extender.");
         }
+    }
+
+    private void inicializarPacientes() {
+        // Datos de 10 pacientes de prueba
+        Paciente[] pacientesPrueba = new Paciente[]{
+            new Paciente("Juan Pérez", 30, "POS", "ninguna"),
+            new Paciente("Ana Gómez", 65, "PC", "limitacion"),
+            new Paciente("Luis Martínez", 15, "POS", "embarazo"),
+            new Paciente("María López", 10, "PC", "ninguna"),
+            new Paciente("Carlos Sánchez", 55, "POS", "ninguna"),
+            new Paciente("Laura Rodríguez", 70, "PC", "limitacion"),
+            new Paciente("Jorge Torres", 45, "POS", "ninguna"),
+            new Paciente("Sofía Morales", 25, "PC", "embarazo"),
+            new Paciente("Diego Ramírez", 12, "POS", "ninguna"),
+            new Paciente("Clara Fernández", 50, "PC", "limitacion")
+        };
+
+        // Registrar los pacientes de prueba
+        for (Paciente paciente : pacientesPrueba) {
+            colaPacientes.offer(paciente);
+        }
+
+        lblTurnosPendientes.setText("Turnos pendientes: " + colaPacientes.size());
     }
 
     public static void main(String[] args) {
